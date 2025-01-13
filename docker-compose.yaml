@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  applications-list:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: always
+    container_name: applications-list 
+    environment:
+      - TZ=America/Toronto # Set the timezone (e.g., for Eastern Time)
+    volumes:
+      - ./data/db:/app/db  # Mapeamento do diretório do banco de dados
+    networks:
+      portage-lab-network:
+        aliases:
+          - applications.localdev.me
+networks:
+  portage-lab-network:
+    external: true      
