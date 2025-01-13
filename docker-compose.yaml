@@ -13,9 +13,10 @@ services:
     volumes:
       - ./data/db:/app/db  # Mapeamento do diretório do banco de dados
     networks:
-      portage-lab-network:
+      home-lab-network:
         aliases:
           - applications.localdev.me
 networks:
-  portage-lab-network:
-    external: true      
+  home-lab-network:
+    name: home-lab-network
+    driver: bridge      

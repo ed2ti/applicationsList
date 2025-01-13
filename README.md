@@ -27,12 +27,17 @@ cd applicationsList
 mkdir -p images data/db
 ```
 
-3. Build and run with Docker Compose:
+3. Configure Docker Network (Optional):
+By default, the application uses a Docker network named `home-lab-network`. If you need to use a different network name:
+- Open `docker-compose.yaml`
+- Replace all occurrences of `home-lab-network` with your preferred network name
+
+4. Build and run with Docker Compose:
 ```bash
 docker-compose up -d --build
 ```
 
-4. Access the application at:
+5. Access the application at:
 ```
 http://localhost:8088
 ```
