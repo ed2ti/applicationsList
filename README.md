@@ -18,16 +18,21 @@ A simple web application built with Go (Gin) to manage a list of applications wi
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/applicationsList.git
+git clone https://github.com/ed2ti/applicationsList.git
 cd applicationsList
 ```
 
-2. Build and run with Docker Compose:
+2. Create required directories:
+```bash
+mkdir -p images data/db
+```
+
+3. Build and run with Docker Compose:
 ```bash
 docker-compose up -d --build
 ```
 
-3. Access the application at:
+4. Access the application at:
 ```
 http://localhost:8080
 ```
@@ -38,8 +43,8 @@ http://localhost:8080
 - `Dockerfile` - Docker container configuration
 - `docker-compose.yaml` - Docker Compose configuration
 - `templates/` - HTML templates
-- `images/` - Uploaded application logos
-- `data/db/` - SQLite database storage
+- `images/` - Uploaded application logos (created at runtime)
+- `data/db/` - SQLite database storage (created at runtime)
 
 ## License
 
