@@ -15,6 +15,9 @@ COPY . .
 # Compila o aplicativo
 RUN GOOS=linux GOARCH=amd64 go build -o app
 
+# Expose port 80
+EXPOSE 80
+
 # Define o comando padrão
 CMD ["./app"]
 

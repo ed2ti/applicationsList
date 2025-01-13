@@ -34,7 +34,7 @@ docker-compose up -d --build
 
 4. Access the application at:
 ```
-http://localhost:80
+http://localhost:8088
 ```
 
 ## Project Structure

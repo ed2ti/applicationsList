@@ -2,10 +2,12 @@
 package main
 
 import (
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
@@ -20,6 +22,12 @@ type Application struct {
 	Link string `gorm:"not null"`
 }
 
+// Configuration represents system settings
+type Configuration struct {
+	ID          uint `gorm:"primaryKey"`
+	CardsPerRow int  `gorm:"not null;default:3"`
+}
+
 var db *gorm.DB
 
 func initDatabase() {
@@ -30,21 +38,73 @@ func initDatabase() {
 	if err != nil {
 		log.Fatal("Failed to connect to database", err)
 	}
-	db.AutoMigrate(&Application{})
+
+	// Auto migrate the schemas
+	db.AutoMigrate(&Application{}, &Configuration{})
+
+	// Initialize default configuration if not exists
+	var config Configuration
+	if db.First(&config).Error != nil {
+		db.Create(&Configuration{CardsPerRow: 3})
+	}
 }
 
 func main() {
 	initDatabase()
 
+	// Set Gin to release mode
+	gin.SetMode(gin.ReleaseMode)
+
 	r := gin.Default()
+
+	// Add template function for division
+	r.SetFuncMap(template.FuncMap{
+		"divide": func(a, b int) int {
+			return a / b
+		},
+	})
+
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/assets", "./assets")
 	r.Static("/images", "./images")
 
 	r.GET("/", func(c *gin.Context) {
 		var apps []Application
+		var config Configuration
 		db.Find(&apps)
-		c.HTML(http.StatusOK, "index.html", gin.H{"apps": apps})
+		db.First(&config)
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"apps":   apps,
+			"config": config,
+		})
+	})
+
+	r.GET("/newApp", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "newApp.html", nil)
+	})
+
+	r.GET("/config", func(c *gin.Context) {
+		var config Configuration
+		db.First(&config)
+		c.HTML(http.StatusOK, "config.html", gin.H{
+			"Config": config,
+		})
+	})
+
+	r.POST("/saveConfig", func(c *gin.Context) {
+		cardsPerRow := c.PostForm("cardsPerRow")
+		cards, err := strconv.Atoi(cardsPerRow)
+		if err != nil || cards < 2 || cards > 5 {
+			c.String(http.StatusBadRequest, "Invalid cards per row value")
+			return
+		}
+
+		var config Configuration
+		db.First(&config)
+		config.CardsPerRow = cards
+		db.Save(&config)
+
+		c.Redirect(http.StatusSeeOther, "/")
 	})
 
 	r.POST("/add", func(c *gin.Context) {
